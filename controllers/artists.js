@@ -5,7 +5,11 @@ const Artist = require('../models/Artist');
 // @access  Public
 exports.getArtists = async (req, res, next) => {
   try {
-    const artists = await Artist.find().populate('albums', 'name _id releaseDate');
+    let artists = await Artist.find().populate('albums', 'name _id releaseDate');
+
+    if(req.query.name){
+      artists = await Artist.find({ slug: req.query.name }).populate('albums');
+    }
 
     res.status(200).json({
       success: true,

@@ -6,7 +6,7 @@ const Artist = require('../models/Artist');
 // @access  Public
 exports.getAlbums = async (req, res, next) => {
   try {
-    const albums = await Album.find().populate('artist', 'name');
+    const albums = await Album.find().populate('artist', 'name').populate('tracks', 'name');
 
     res.status(200).json({
       success: true,
@@ -23,7 +23,7 @@ exports.getAlbums = async (req, res, next) => {
 // @access  Public
 exports.getAlbum = async (req, res, next) => {
   try {
-    const album = await Album.findById(req.params.id).populate('artist');
+    const album = await Album.findById(req.params.id).populate('artist').populate('tracks');
 
     if(!album)
       return next({ kind: 'ObjectIdNotInDB' });
@@ -47,7 +47,7 @@ exports.getAlbumsByArtist = async (req, res, next) => {
     if(!artist)
       return next({ kind: 'ObjectIdNotInDB' });
 
-    const albums = await Album.find({ artist: req.params.artistId });
+    const albums = await Album.find({ artist: req.params.artistId }).populate('tracks', 'name');
 
     res.status(200).json({
       success: true,

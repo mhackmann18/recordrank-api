@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'), Schema = mongoose.Schema;
 const slugify = require('slugify');
 
-const AlbumSchema = new mongoose.Schema({
+const AlbumSchema = new Schema({
   name: {
     type: String,
     required: [true, 'Please add a name'],
@@ -61,16 +61,26 @@ const AlbumSchema = new mongoose.Schema({
     ]
   },
   artist: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     required: [true, 'Please add an artist id'],
     ref: 'Artist'
   },
   slug: String
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
 AlbumSchema.pre('save', function(next){
   this.slug = slugify(this.name, { lower: true });
   next()
+});
+
+AlbumSchema.virtual('tracks', {
+  ref: 'Track',
+  localField: '_id',
+  foreignField: 'album',
+  justOne: false
 });
 
 module.exports = mongoose.model('Album', AlbumSchema);

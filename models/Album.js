@@ -1,5 +1,6 @@
 const mongoose = require('mongoose'), Schema = mongoose.Schema;
 const slugify = require('slugify');
+require('./Track');
 
 const AlbumSchema = new Schema({
   name: {
@@ -81,6 +82,12 @@ AlbumSchema.virtual('tracks', {
   localField: '_id',
   foreignField: 'album',
   justOne: false
+});
+
+// Cascade delete albums when an artist is deleted
+AlbumSchema.pre('remove', async function(next){
+  await this.model('Track').deleteMany({ album: this._id });
+  next();
 });
 
 module.exports = mongoose.model('Album', AlbumSchema);
